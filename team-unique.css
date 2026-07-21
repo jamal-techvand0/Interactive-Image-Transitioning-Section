@@ -11,28 +11,27 @@
    • NO scroll triggers, NO hover-triggered content changes
    ========================================================================== */
 
-@import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300..700;1,9..40,300..700&display=swap');
-
+@import url("https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300..700;1,9..40,300..700&display=swap");
 
 /* ══════════════════════════════════════════════════════════════════════════════
    DESIGN TOKENS
    ══════════════════════════════════════════════════════════════════════════════ */
 .tu-section {
   /* Palette */
-  --tu-bg: #F6F4EF;
-  --tu-surface: #FFFFFF;
+  --tu-bg: #f6f4ef;
+  --tu-surface: #ffffff;
   --tu-border: rgba(26, 35, 50, 0.07);
-  --tu-ink: #1A2332;
-  --tu-ink-2: #58677A;
-  --tu-teal-deep: #0D3033;
-  --tu-teal: #1C7A80;
-  --tu-blue: #2C5C86;
-  --tu-gold: #C89B5C;
-  --tu-white: #FFFFFF;
+  --tu-ink: #1a2332;
+  --tu-ink-2: #58677a;
+  --tu-teal-deep: #0d3033;
+  --tu-teal: #1c7a80;
+  --tu-blue: #2c5c86;
+  --tu-gold: #c89b5c;
+  --tu-white: #ffffff;
 
   /* Typography */
-  --tu-font-display: 'DM Serif Display', Georgia, serif;
-  --tu-font-body: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  --tu-font-display: "DM Serif Display", Georgia, serif;
+  --tu-font-body: "DM Sans", -apple-system, BlinkMacSystemFont, sans-serif;
 
   /* Motion */
   --tu-ease: cubic-bezier(0.22, 0.61, 0.36, 1);
@@ -61,17 +60,28 @@
 
 /* Very subtle page-level gradient — gives depth without texture noise */
 .tu-section::before {
-  content: '';
+  content: "";
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(ellipse 110% 50% at 50% -8%, rgba(255, 253, 247, 0.95) 0%, transparent 70%),
-    radial-gradient(ellipse 70% 70% at 8% 92%, rgba(28, 122, 128, 0.05) 0%, transparent 55%),
-    radial-gradient(ellipse 55% 55% at 92% 10%, rgba(44, 92, 134, 0.04) 0%, transparent 50%);
+    radial-gradient(
+      ellipse 110% 50% at 50% -8%,
+      rgba(255, 253, 247, 0.95) 0%,
+      transparent 70%
+    ),
+    radial-gradient(
+      ellipse 70% 70% at 8% 92%,
+      rgba(28, 122, 128, 0.05) 0%,
+      transparent 55%
+    ),
+    radial-gradient(
+      ellipse 55% 55% at 92% 10%,
+      rgba(44, 92, 134, 0.04) 0%,
+      transparent 50%
+    );
   pointer-events: none;
   z-index: 0;
 }
-
 
 /* ══════════════════════════════════════════════════════════════════════════════
    HEADER
@@ -104,7 +114,6 @@
   color: var(--tu-ink);
   letter-spacing: -0.015em;
 }
-
 
 /* ══════════════════════════════════════════════════════════════════════════════
    STAGE / RING LAYOUT
@@ -145,7 +154,6 @@
 .tu-item--left .tu-card {
   margin-left: auto;
 }
-
 
 /* ══════════════════════════════════════════════════════════════════════════════
    CARD — CLOSED STATE
@@ -190,7 +198,8 @@
   box-shadow:
     0 0 0 1px var(--tu-border),
     0 2px 8px rgba(26, 35, 50, 0.05),
-    0 0 0 5px color-mix(in srgb, var(--tu-accent, var(--tu-teal)) 20%, transparent);
+    0 0 0 5px
+      color-mix(in srgb, var(--tu-accent, var(--tu-teal)) 20%, transparent);
 }
 
 /* ── Living color aura — the "light under frosted glass" effect ─────────── */
@@ -260,7 +269,7 @@
 }
 
 .tu-card-icon::after {
-  content: '';
+  content: "";
   position: absolute;
   inset: 11px;
   border-radius: 50%;
@@ -298,11 +307,13 @@
   position: relative;
   opacity: 0.28;
   margin-top: 8px;
-  transition: transform var(--tu-dur) var(--tu-ease), opacity var(--tu-dur) var(--tu-ease);
+  transition:
+    transform var(--tu-dur) var(--tu-ease),
+    opacity var(--tu-dur) var(--tu-ease);
 }
 
 .tu-card-chevron::before {
-  content: '';
+  content: "";
   position: absolute;
   inset: 0;
   border-right: 1.5px solid var(--tu-ink);
@@ -317,7 +328,6 @@
 .tu-card:not([aria-expanded="true"]):hover .tu-card-chevron {
   opacity: 0.55;
 }
-
 
 /* ══════════════════════════════════════════════════════════════════════════════
    ACTIVE / DIMMED CARD STATES
@@ -339,12 +349,13 @@
 }
 
 /* The other five cards dim and desaturate in the same beat as liftoff */
-.tu-section[data-active]:not([data-active=""]) .tu-item:not(.is-active) .tu-card {
+.tu-section[data-active]:not([data-active=""])
+  .tu-item:not(.is-active)
+  .tu-card {
   opacity: 0.38;
   filter: saturate(0.3);
   transform: scale(0.975);
 }
-
 
 /* ══════════════════════════════════════════════════════════════════════════════
    MOTIF AURA LAYERS — shared by .tu-card-aura AND .tu-panel-aura
@@ -361,115 +372,160 @@
 
 /* ── Water (ecosystem — teal) ────────────────────────────────────────────── */
 .tu-motif--water .tu-motif-bg {
-  background: linear-gradient(145deg, #0B2E30 0%, #1A6870 45%, #1C7A80 100%);
+  background: linear-gradient(145deg, #0b2e30 0%, #1a6870 45%, #1c7a80 100%);
 }
 
 .tu-motif--water .tu-motif-glow {
-  background: repeating-linear-gradient(102deg,
-      rgba(140, 220, 230, 0.00) 0px,
-      rgba(140, 220, 230, 0.50) 80px,
-      rgba(140, 220, 230, 0.00) 160px);
+  background: repeating-linear-gradient(
+    102deg,
+    rgba(140, 220, 230, 0) 0px,
+    rgba(140, 220, 230, 0.5) 80px,
+    rgba(140, 220, 230, 0) 160px
+  );
   background-size: 300% 100%;
   animation: tu-flow 16s linear infinite;
 }
 
 .tu-motif--water .tu-motif-detail {
   background:
-    radial-gradient(ellipse 110% 90% at 18% 115%, rgba(80, 200, 220, 0.55) 0%, transparent 55%),
-    radial-gradient(ellipse 70% 60% at 82% -15%, rgba(28, 122, 128, 0.40) 0%, transparent 50%);
+    radial-gradient(
+      ellipse 110% 90% at 18% 115%,
+      rgba(80, 200, 220, 0.55) 0%,
+      transparent 55%
+    ),
+    radial-gradient(
+      ellipse 70% 60% at 82% -15%,
+      rgba(28, 122, 128, 0.4) 0%,
+      transparent 50%
+    );
   animation: tu-water-drift 11s ease-in-out infinite alternate;
 }
 
 /* ── Flame (commitment — forest green) ──────────────────────────────────── */
 .tu-motif--flame .tu-motif-bg {
-  background: linear-gradient(165deg, #142B1E 0%, #254D35 45%, #3A6848 100%);
+  background: linear-gradient(165deg, #142b1e 0%, #254d35 45%, #3a6848 100%);
 }
 
 .tu-motif--flame .tu-motif-glow {
-  background: radial-gradient(ellipse 120% 110% at 50% 108%,
-      rgba(255, 190, 70, 0.50) 0%,
-      rgba(255, 110, 30, 0.20) 40%,
-      transparent 65%);
+  background: radial-gradient(
+    ellipse 120% 110% at 50% 108%,
+    rgba(255, 190, 70, 0.5) 0%,
+    rgba(255, 110, 30, 0.2) 40%,
+    transparent 65%
+  );
   animation: tu-flicker 3.6s ease-in-out infinite;
 }
 
 .tu-motif--flame .tu-motif-detail {
-  background: radial-gradient(ellipse 80% 90% at 50% 118%,
-      rgba(255, 145, 45, 0.55) 0%,
-      transparent 50%);
+  background: radial-gradient(
+    ellipse 80% 90% at 50% 118%,
+    rgba(255, 145, 45, 0.55) 0%,
+    transparent 50%
+  );
   animation: tu-flicker 2.2s ease-in-out infinite reverse;
 }
 
 /* ── Light (product — gold) ──────────────────────────────────────────────── */
 .tu-motif--light .tu-motif-bg {
-  background: linear-gradient(140deg, #5C3D12 0%, #8C5E24 40%, #C89B5C 100%);
+  background: linear-gradient(140deg, #5c3d12 0%, #8c5e24 40%, #c89b5c 100%);
 }
 
 .tu-motif--light .tu-motif-glow {
-  background: conic-gradient(from 0deg at 50% 50%,
-      transparent 0deg,
-      rgba(255, 240, 180, 0.38) 30deg,
-      rgba(255, 240, 180, 0.10) 60deg,
-      transparent 90deg,
-      transparent 360deg);
+  background: conic-gradient(
+    from 0deg at 50% 50%,
+    transparent 0deg,
+    rgba(255, 240, 180, 0.38) 30deg,
+    rgba(255, 240, 180, 0.1) 60deg,
+    transparent 90deg,
+    transparent 360deg
+  );
   animation: tu-sweep 9s linear infinite;
 }
 
 .tu-motif--light .tu-motif-detail {
   background:
-    radial-gradient(ellipse 90% 120% at 50% -15%, rgba(255, 245, 200, 0.35) 0%, transparent 60%),
-    radial-gradient(ellipse 55% 55% at 78% 82%, rgba(200, 155, 92, 0.30) 0%, transparent 50%);
+    radial-gradient(
+      ellipse 90% 120% at 50% -15%,
+      rgba(255, 245, 200, 0.35) 0%,
+      transparent 60%
+    ),
+    radial-gradient(
+      ellipse 55% 55% at 78% 82%,
+      rgba(200, 155, 92, 0.3) 0%,
+      transparent 50%
+    );
   animation: tu-light-pulse 5.5s ease-in-out infinite alternate;
 }
 
 /* ── Sunrise (strengths — dark teal) ─────────────────────────────────────── */
 .tu-motif--sunrise .tu-motif-bg {
-  background: linear-gradient(185deg, #0A2E30 0%, #12484B 40%, #1A6870 100%);
+  background: linear-gradient(185deg, #0a2e30 0%, #12484b 40%, #1a6870 100%);
 }
 
 .tu-motif--sunrise .tu-motif-glow {
-  background: radial-gradient(ellipse 130% 140% at 50% 128%,
-      rgba(255, 205, 110, 0.48) 0%,
-      rgba(255, 160, 70, 0.18) 38%,
-      transparent 58%);
+  background: radial-gradient(
+    ellipse 130% 140% at 50% 128%,
+    rgba(255, 205, 110, 0.48) 0%,
+    rgba(255, 160, 70, 0.18) 38%,
+    transparent 58%
+  );
   animation: tu-pulse 6.5s ease-in-out infinite;
 }
 
 .tu-motif--sunrise .tu-motif-detail {
   background:
     linear-gradient(180deg, rgba(255, 235, 160, 0.14) 0%, transparent 52%),
-    radial-gradient(ellipse 100% 65% at 50% 100%, rgba(255, 195, 95, 0.22) 0%, transparent 60%);
+    radial-gradient(
+      ellipse 100% 65% at 50% 100%,
+      rgba(255, 195, 95, 0.22) 0%,
+      transparent 60%
+    );
   animation: tu-sunrise-shift 8s ease-in-out infinite alternate;
 }
 
 /* ── Stone (structure — dark navy) ───────────────────────────────────────── */
 .tu-motif--stone .tu-motif-bg {
-  background: linear-gradient(155deg, #0E1620 0%, #1B2A3D 50%, #243D5A 100%);
+  background: linear-gradient(155deg, #0e1620 0%, #1b2a3d 50%, #243d5a 100%);
 }
 
 .tu-motif--stone .tu-motif-glow {
   background:
-    repeating-linear-gradient(0deg, rgba(200, 220, 255, 0.04) 0 1px, transparent 1px 48px),
-    repeating-linear-gradient(90deg, rgba(200, 220, 255, 0.04) 0 1px, transparent 1px 72px);
+    repeating-linear-gradient(
+      0deg,
+      rgba(200, 220, 255, 0.04) 0 1px,
+      transparent 1px 48px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      rgba(200, 220, 255, 0.04) 0 1px,
+      transparent 1px 72px
+    );
 }
 
 .tu-motif--stone .tu-motif-detail {
-  background: linear-gradient(110deg, transparent 36%, rgba(180, 210, 255, 0.12) 50%, transparent 64%);
+  background: linear-gradient(
+    110deg,
+    transparent 36%,
+    rgba(180, 210, 255, 0.12) 50%,
+    transparent 64%
+  );
   background-size: 300% 100%;
   animation: tu-sheen 8s ease-in-out infinite;
 }
 
 /* ── Arches (path — mid-blue) ─────────────────────────────────────────────── */
 .tu-motif--arches .tu-motif-bg {
-  background: linear-gradient(175deg, #0C2238 0%, #1A3A5C 45%, #2C5C86 100%);
+  background: linear-gradient(175deg, #0c2238 0%, #1a3a5c 45%, #2c5c86 100%);
 }
 
 .tu-motif--arches .tu-motif-glow {
-  background-image: radial-gradient(ellipse at 50% 125%,
-      transparent 52%,
-      rgba(200, 155, 92, 0.18) 56%,
-      rgba(200, 155, 92, 0.18) 64%,
-      transparent 68%);
+  background-image: radial-gradient(
+    ellipse at 50% 125%,
+    transparent 52%,
+    rgba(200, 155, 92, 0.18) 56%,
+    rgba(200, 155, 92, 0.18) 64%,
+    transparent 68%
+  );
   background-size: 110px 200px;
   background-position: 0 0;
   animation: tu-arch-drift 15s linear infinite;
@@ -477,8 +533,16 @@
 
 .tu-motif--arches .tu-motif-detail {
   background:
-    radial-gradient(ellipse 95% 85% at 50% 112%, rgba(200, 155, 92, 0.28) 0%, transparent 60%),
-    radial-gradient(ellipse 65% 45% at 50% -12%, rgba(44, 92, 134, 0.30) 0%, transparent 50%);
+    radial-gradient(
+      ellipse 95% 85% at 50% 112%,
+      rgba(200, 155, 92, 0.28) 0%,
+      transparent 60%
+    ),
+    radial-gradient(
+      ellipse 65% 45% at 50% -12%,
+      rgba(44, 92, 134, 0.3) 0%,
+      transparent 50%
+    );
 }
 
 /* ── Keyframes ────────────────────────────────────────────────────────────── */
@@ -495,16 +559,15 @@
 }
 
 @keyframes tu-flicker {
-
   0%,
   100% {
-    opacity: 0.60;
-    transform: scaleY(1.00);
+    opacity: 0.6;
+    transform: scaleY(1);
   }
 
   45% {
-    opacity: 1.00;
-    transform: scaleY(1.10);
+    opacity: 1;
+    transform: scaleY(1.1);
   }
 }
 
@@ -515,7 +578,6 @@
 }
 
 @keyframes tu-pulse {
-
   0%,
   100% {
     opacity: 0.52;
@@ -527,7 +589,6 @@
 }
 
 @keyframes tu-sheen {
-
   0%,
   100% {
     background-position: 300% 0;
@@ -551,21 +612,20 @@
   }
 
   100% {
-    opacity: 1.00;
+    opacity: 1;
     transform: translateY(18px);
   }
 }
 
 @keyframes tu-sunrise-shift {
   0% {
-    transform: scale(1.00) translateX(0%);
+    transform: scale(1) translateX(0%);
   }
 
   100% {
-    transform: scale(1.10) translateX(4%);
+    transform: scale(1.1) translateX(4%);
   }
 }
-
 
 /* ══════════════════════════════════════════════════════════════════════════════
    PORTAL — GSAP Flip animation container
@@ -584,7 +644,6 @@
 .tu-section.has-open-panel .tu-portal {
   pointer-events: auto;
 }
-
 
 /* ══════════════════════════════════════════════════════════════════════════════
    PANEL (expanded card detail)
@@ -692,39 +751,50 @@
   margin: 0;
   opacity: 0;
   transform: translateY(14px);
-  transition: opacity 80ms ease, transform 80ms ease;
+  transition:
+    opacity 80ms ease,
+    transform 80ms ease;
 }
 
 .tu-panel.is-visible .tu-panel-kicker {
   opacity: 1;
   transform: translateY(0);
-  transition: opacity 320ms var(--tu-ease) 80ms, transform 320ms var(--tu-ease) 80ms;
+  transition:
+    opacity 320ms var(--tu-ease) 80ms,
+    transform 320ms var(--tu-ease) 80ms;
 }
 
 .tu-panel.is-visible .tu-panel-title {
   opacity: 1;
   transform: translateY(0);
-  transition: opacity 340ms var(--tu-ease) 160ms, transform 340ms var(--tu-ease) 160ms;
+  transition:
+    opacity 340ms var(--tu-ease) 160ms,
+    transform 340ms var(--tu-ease) 160ms;
 }
 
 .tu-panel.is-visible .tu-panel-highlights {
   opacity: 1;
   transform: translateY(0);
-  transition: opacity 340ms var(--tu-ease) 200ms, transform 340ms var(--tu-ease) 200ms;
+  transition:
+    opacity 340ms var(--tu-ease) 200ms,
+    transform 340ms var(--tu-ease) 200ms;
 }
 
 .tu-panel.is-visible .tu-panel-detail {
   opacity: 1;
   transform: translateY(0);
-  transition: opacity 340ms var(--tu-ease) 240ms, transform 340ms var(--tu-ease) 240ms;
+  transition:
+    opacity 340ms var(--tu-ease) 240ms,
+    transform 340ms var(--tu-ease) 240ms;
 }
 
 .tu-panel.is-visible .tu-panel-interactive {
   opacity: 1;
   transform: translateY(0);
-  transition: opacity 340ms var(--tu-ease) 300ms, transform 340ms var(--tu-ease) 300ms;
+  transition:
+    opacity 340ms var(--tu-ease) 300ms,
+    transform 340ms var(--tu-ease) 300ms;
 }
-
 
 .tu-panel-kicker {
   font-family: var(--tu-font-body);
@@ -749,7 +819,7 @@
 
 .tu-panel-detail {
   font-size: clamp(14.5px, 1.7vw, 17.5px);
-  line-height: 1.70;
+  line-height: 1.7;
   color: var(--tu-ink-2);
   max-width: 620px;
   margin-bottom: 24px;
@@ -860,7 +930,10 @@
   opacity: 0;
   visibility: hidden;
   transform: translateY(4px);
-  transition: opacity 200ms ease, transform 200ms ease, visibility 0ms linear 200ms;
+  transition:
+    opacity 200ms ease,
+    transform 200ms ease,
+    visibility 0ms linear 200ms;
 }
 
 .tu-tab-panel p {
@@ -875,9 +948,11 @@
   opacity: 1;
   visibility: visible;
   transform: translateY(0);
-  transition: opacity 250ms ease 100ms, transform 250ms ease 100ms, visibility 0ms linear 0ms;
+  transition:
+    opacity 250ms ease 100ms,
+    transform 250ms ease 100ms,
+    visibility 0ms linear 0ms;
 }
-
 
 /* Close button */
 .tu-panel-close {
@@ -896,7 +971,10 @@
   color: var(--tu-ink-2);
   background: rgba(26, 35, 50, 0.06);
   border: 1px solid rgba(26, 35, 50, 0.08);
-  transition: background 180ms ease, transform 180ms ease, color 180ms ease;
+  transition:
+    background 180ms ease,
+    transform 180ms ease,
+    color 180ms ease;
   z-index: 4;
   /* Hidden/disabled until panel content is visible */
   opacity: 0;
@@ -912,7 +990,7 @@
 }
 
 .tu-panel-close:hover {
-  background: rgba(26, 35, 50, 0.10);
+  background: rgba(26, 35, 50, 0.1);
   transform: rotate(90deg);
   color: var(--tu-ink);
 }
@@ -921,7 +999,6 @@
   outline: 2px solid var(--tu-accent, var(--tu-teal));
   outline-offset: 2px;
 }
-
 
 /* ══════════════════════════════════════════════════════════════════════════════
    CENTRAL CORE CIRCLE — overflow bug fixed
@@ -944,8 +1021,14 @@
   position: absolute;
   inset: -14px;
   border-radius: 50%;
-  background: conic-gradient(from 0deg, var(--tu-teal), var(--tu-blue), var(--tu-gold), var(--tu-teal));
-  opacity: 0.40;
+  background: conic-gradient(
+    from 0deg,
+    var(--tu-teal),
+    var(--tu-blue),
+    var(--tu-gold),
+    var(--tu-teal)
+  );
+  opacity: 0.4;
   filter: blur(3px);
   animation: tu-spin 22s linear infinite;
 }
@@ -1042,10 +1125,17 @@
   position: absolute;
   inset: 10px;
   border-radius: 50%;
-  background: radial-gradient(circle at 34% 26%, #C8E8EC 0%, var(--tu-teal) 44%, #192F56 100%);
+  background: radial-gradient(
+    circle at 34% 26%,
+    #c8e8ec 0%,
+    var(--tu-teal) 44%,
+    #192f56 100%
+  );
   /* BUG FIX: overflow:hidden ensures faces can't bleed outside the circle */
   overflow: hidden;
-  box-shadow: 0 20px 52px rgba(15, 42, 48, 0.32), inset 0 0 0 5px rgba(255, 255, 255, 0.42);
+  box-shadow:
+    0 20px 52px rgba(15, 42, 48, 0.32),
+    inset 0 0 0 5px rgba(255, 255, 255, 0.42);
   z-index: 1;
 }
 
@@ -1072,7 +1162,7 @@
   visibility: hidden;
   pointer-events: none;
   /* Slight scale adds personality to the swap */
-  transform: scale(0.90);
+  transform: scale(0.9);
   transition:
     opacity 380ms var(--tu-ease),
     transform 380ms var(--tu-ease),
@@ -1096,7 +1186,7 @@
 .tu-section[data-active]:not([data-active=""]) .tu-core-face--default {
   opacity: 0;
   visibility: hidden;
-  transform: scale(0.90);
+  transform: scale(0.9);
   transition:
     opacity 380ms var(--tu-ease),
     transform 380ms var(--tu-ease),
@@ -1125,9 +1215,11 @@
 
 /* Scene face — shown when its theme is active */
 .tu-core-face--scene {
-  background: radial-gradient(circle at 50% 28%,
-      color-mix(in srgb, var(--tu-accent) 65%, var(--tu-teal-deep)) 0%,
-      var(--tu-teal-deep) 100%);
+  background: radial-gradient(
+    circle at 50% 28%,
+    color-mix(in srgb, var(--tu-accent) 65%, var(--tu-teal-deep)) 0%,
+    var(--tu-teal-deep) 100%
+  );
 }
 
 /* BUG FIX: is-active drives BOTH opacity and visibility simultaneously on show */
@@ -1177,7 +1269,6 @@
   padding: 0 8px;
 }
 
-
 /* ── Light beam ─────────────────────────────────────────────────────────── */
 .tu-beam {
   position: absolute;
@@ -1215,6 +1306,251 @@
   }
 }
 
+/* ══════════════════════════════════════════════════════════════════════════════
+   THEATER MODE — full-screen video-driven takeover
+   Opened instead of the side panel on card click. Cards leave the ring and
+   reflow into a bottom filmstrip; canvas scrubs a numbered frame sequence
+   (themes without a clip yet fall back to the same .tu-motif-- gradients
+   used on the closed cards / old panel above).
+   ══════════════════════════════════════════════════════════════════════════════ */
+.tu-theater {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: #0a0f14;
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity var(--tu-dur) var(--tu-ease),
+    visibility 0ms linear var(--tu-dur);
+}
+
+.tu-theater.is-open {
+  opacity: 1;
+  visibility: visible;
+  transition:
+    opacity var(--tu-dur) var(--tu-ease),
+    visibility 0ms linear 0ms;
+}
+
+.tu-theater-stage {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+.tu-theater-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  transition: opacity 380ms var(--tu-ease);
+}
+
+.tu-theater-canvas.is-visible {
+  opacity: 1;
+}
+
+/* Motif-gradient fallback for themes with no generated clip yet — same
+   layered look as .tu-card-aura / .tu-panel-aura elsewhere in this file. */
+.tu-theater-poster {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 420ms var(--tu-ease);
+}
+
+.tu-theater-poster.is-visible {
+  opacity: 1;
+}
+
+.tu-theater-scrim {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(
+      0deg,
+      rgba(4, 8, 12, 0.82) 0%,
+      rgba(4, 8, 12, 0.35) 32%,
+      rgba(4, 8, 12, 0.05) 55%,
+      transparent 68%
+    ),
+    linear-gradient(180deg, rgba(4, 8, 12, 0.55) 0%, transparent 22%);
+  pointer-events: none;
+}
+
+.tu-theater-close {
+  all: unset;
+  cursor: pointer;
+  position: absolute;
+  top: clamp(16px, 3vw, 32px);
+  right: clamp(16px, 3vw, 32px);
+  z-index: 3;
+  width: 42px;
+  height: 42px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.18);
+  color: var(--tu-white);
+  font-size: 15px;
+  transition:
+    background var(--tu-dur) var(--tu-ease),
+    transform var(--tu-dur) var(--tu-ease);
+}
+
+.tu-theater-close:hover {
+  background: rgba(255, 255, 255, 0.18);
+  transform: scale(1.06);
+}
+
+.tu-theater-close:focus-visible {
+  outline: 2px solid var(--tu-white);
+  outline-offset: 3px;
+}
+
+.tu-theater-content {
+  position: absolute;
+  left: clamp(20px, 6vw, 72px);
+  right: clamp(20px, 6vw, 72px);
+  bottom: clamp(120px, 16vw, 168px);
+  z-index: 2;
+  max-width: 620px;
+  color: var(--tu-white);
+}
+
+.tu-theater-kicker {
+  margin: 0 0 10px;
+  font-family: var(--tu-font-body);
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.72);
+  opacity: 0;
+  transform: translateY(10px);
+  transition:
+    opacity 320ms var(--tu-ease) 60ms,
+    transform 320ms var(--tu-ease) 60ms;
+}
+
+.tu-theater-title {
+  margin: 0 0 12px;
+  font-family: var(--tu-font-display);
+  font-style: italic;
+  font-weight: 400;
+  font-size: clamp(24px, 4vw, 42px);
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+  opacity: 0;
+  transform: translateY(10px);
+  transition:
+    opacity 320ms var(--tu-ease) 110ms,
+    transform 320ms var(--tu-ease) 110ms;
+}
+
+.tu-theater-detail {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.55;
+  color: rgba(255, 255, 255, 0.82);
+  opacity: 0;
+  transform: translateY(10px);
+  transition:
+    opacity 320ms var(--tu-ease) 160ms,
+    transform 320ms var(--tu-ease) 160ms;
+}
+
+.tu-theater.is-content-visible .tu-theater-kicker,
+.tu-theater.is-content-visible .tu-theater-title,
+.tu-theater.is-content-visible .tu-theater-detail {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ── Bottom-center filmstrip ─────────────────────────────────────────── */
+.tu-theater-filmstrip {
+  position: absolute;
+  left: 50%;
+  bottom: clamp(20px, 3.4vw, 36px);
+  transform: translateX(-50%);
+  z-index: 3;
+  display: flex;
+  gap: 8px;
+  padding: 8px;
+  max-width: min(94vw, 980px);
+  overflow-x: auto;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.14);
+  scrollbar-width: none;
+}
+
+.tu-theater-filmstrip::-webkit-scrollbar {
+  display: none;
+}
+
+.tu-film-btn {
+  all: unset;
+  cursor: pointer;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px 10px 12px;
+  border-radius: 999px;
+  color: rgba(255, 255, 255, 0.72);
+  transition:
+    background var(--tu-dur) var(--tu-ease),
+    color var(--tu-dur) var(--tu-ease);
+}
+
+.tu-film-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--tu-white);
+}
+
+.tu-film-btn:focus-visible {
+  outline: 2px solid var(--tu-white);
+  outline-offset: 2px;
+}
+
+.tu-film-dot {
+  flex-shrink: 0;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--tu-accent);
+  opacity: 0.55;
+  transition:
+    opacity var(--tu-dur) var(--tu-ease),
+    transform var(--tu-dur) var(--tu-ease);
+}
+
+.tu-film-label {
+  font-family: var(--tu-font-body);
+  font-weight: 600;
+  font-size: 12.5px;
+  letter-spacing: -0.005em;
+  white-space: nowrap;
+}
+
+.tu-film-btn[aria-selected="true"] {
+  background: rgba(255, 255, 255, 0.16);
+  color: var(--tu-white);
+}
+
+.tu-film-btn[aria-selected="true"] .tu-film-dot {
+  opacity: 1;
+  transform: scale(1.3);
+}
 
 /* ══════════════════════════════════════════════════════════════════════════════
    MOBILE
@@ -1285,8 +1621,37 @@
   .tu-panel-interactive {
     padding: 16px;
   }
-}
 
+  /* Theater mode on mobile: same full-screen takeover, filmstrip stays
+     pinned bottom and scrolls horizontally (no room to wrap on-screen). */
+  .tu-theater-content {
+    bottom: 92px;
+    right: 20px;
+  }
+
+  .tu-theater-title {
+    font-size: clamp(22px, 6.5vw, 30px);
+  }
+
+  .tu-theater-detail {
+    font-size: 14px;
+  }
+
+  .tu-theater-filmstrip {
+    left: 12px;
+    right: 12px;
+    bottom: 14px;
+    transform: none;
+    max-width: none;
+    justify-content: flex-start;
+  }
+
+  .tu-film-label {
+    max-width: 120px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
 
 /* ══════════════════════════════════════════════════════════════════════════════
    REDUCED MOTION — no transforms, no animations, instant state change
@@ -1301,4 +1666,15 @@
 
   /* Card aura blobs freeze on first frame (animations killed above) */
   /* Tilt is disabled in JS via the reduceMotion flag */
+
+  /* Theater: JS skips frame tweening and jumps straight to the target
+     frame/poster when this flag is set; this just kills the CSS fades too. */
+  .tu-theater,
+  .tu-theater-canvas,
+  .tu-theater-poster,
+  .tu-theater-kicker,
+  .tu-theater-title,
+  .tu-theater-detail {
+    transition-duration: 0.001ms !important;
+  }
 }

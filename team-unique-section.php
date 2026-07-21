@@ -214,4 +214,70 @@ $tuThemes = require __DIR__ . '/team-unique-data.php';
   -->
   <div class="tu-portal" id="tu-portal" aria-hidden="true"></div>
 
+  <!--
+    ══════════════════════════════════════════════════════════════════════
+    THEATER MODE — full-screen video-driven takeover.
+    Opened in place of the old side-panel Flip when a card is clicked.
+    Cards leave the ring and reflow into the bottom filmstrip while this
+    is open; the background is a <canvas> scrubbing a numbered frame
+    sequence (themes without a generated clip yet fall back to the same
+    .tu-motif-- gradient used elsewhere in this file).
+    ══════════════════════════════════════════════════════════════════════
+  -->
+  <div class="tu-theater" id="tu-theater" role="dialog" aria-modal="true" aria-label="Theme showcase" aria-hidden="true">
+
+    <div class="tu-theater-stage">
+      <canvas class="tu-theater-canvas" id="tu-theater-canvas"></canvas>
+      <div class="tu-theater-poster" id="tu-theater-poster" aria-hidden="true">
+        <span class="tu-motif-bg"></span>
+        <span class="tu-motif-glow"></span>
+        <span class="tu-motif-detail"></span>
+      </div>
+      <div class="tu-theater-scrim" aria-hidden="true"></div>
+    </div>
+
+    <button type="button" class="tu-theater-close" id="tu-theater-close" aria-label="Close showcase">
+      <span aria-hidden="true">&#x2715;</span>
+    </button>
+
+    <div class="tu-theater-content">
+      <p class="tu-theater-kicker" id="tu-theater-kicker"></p>
+      <h3 class="tu-theater-title" id="tu-theater-title"></h3>
+      <p class="tu-theater-detail" id="tu-theater-detail"></p>
+    </div>
+
+    <div class="tu-theater-filmstrip" role="tablist" aria-label="Choose a theme">
+      <?php foreach ($tuThemes as $theme): ?>
+      <button
+        type="button"
+        class="tu-film-btn"
+        id="tu-film-<?= htmlspecialchars($theme['id']) ?>"
+        data-theme="<?= htmlspecialchars($theme['id']) ?>"
+        style="--tu-accent:<?= htmlspecialchars($theme['accent']) ?>;"
+        role="tab"
+        aria-selected="false"
+      >
+        <span class="tu-film-dot" aria-hidden="true"></span>
+        <span class="tu-film-label"><?= htmlspecialchars($theme['label']) ?></span>
+      </button>
+      <?php endforeach; ?>
+    </div>
+  </div>
+
+  <script>
+    /* Theater-mode config, generated from team-unique-data.php so content
+       edits never require touching team-unique.js. */
+    window.TU_THEATER_DATA = <?= json_encode(array_map(function ($t) {
+        return [
+            'id'      => $t['id'],
+            'motif'   => $t['motif'],
+            'label'   => $t['label'],
+            'summary' => $t['summary'],
+            'detail'  => $t['detail'],
+            'accent'  => $t['accent'],
+            'frames'  => isset($t['frames']) ? $t['frames'] : null,
+        ];
+    }, $tuThemes), JSON_UNESCAPED_SLASHES) ?>;
+  </script>
+
 </section>

@@ -50,6 +50,18 @@ return [
         'detail'  => 'Every cohort presents a finished product to a professional or public audience — competitions, hackathons, exhibitions, and galleries held before graduation.',
         'accent'  => '#C89B5C',
         'image'   => 'assets/scene-product.webp',
+        /* Theater mode: numbered frame sequence for the Hub -> Product video
+           transition. Extracted from the Higgsfield Kling clip (card-1.png
+           start frame / card-2.png end frame) at 15fps, 1280x720 JPG.
+           Omit this key entirely on any theme that has no clip yet — theater
+           mode falls back to the existing motif gradient for those. */
+        'frames'  => [
+            'dir'    => 'assets/theater-frames/hub-to-product/',
+            'prefix' => 'frame_',
+            'ext'    => 'jpg',
+            'pad'    => 3,
+            'count'  => 46,
+        ],
         'highlights' => [
             ['label' => '1', 'caption' => 'Final showcase every single cohort'],
             ['label' => 'Public + Pro', 'caption' => 'Audiences spanning both tracks'],
