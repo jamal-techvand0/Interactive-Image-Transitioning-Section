@@ -724,18 +724,16 @@
      THEATER MODE
      Full-screen video-driven takeover, opened in place of the old side panel.
 
-     Hub-and-spoke video model:
-       • Every theme with a `frames` sequence goes Hub (frame 0) -> Theme
-         (last frame). There is no theme-to-theme clip.
-       • Jumping between two "has video" themes is done in two fixed-duration
-         legs: retreat (play the currently-open clip backward to frame 0),
-         then advance (play the target clip forward from frame 0). Total time
-         is always the same regardless of which two themes are involved.
-       • Themes without a `frames` sequence yet fall back to a crossfade of
-         the existing .tu-motif-- gradient (same visual language as the
-         cards / old panel), so the UI is fully functional today and any
-         theme "lights up" with real video the moment its clip + frames are
-         added to team-unique-data.php — no JS changes needed.
+     Two clip layers per theme:
+       • openFrames — main team-photo screen -> this theme. Played forward on
+         the very first open (theater closed -> open), and reversed on the
+         final close (theater open -> fully closed). Themes without this key
+         fall back to snapping straight to their linked-pair rest frame.
+       • frames — linked-pair clip shared by two themes (e.g. ecosystem <->
+         product), scrubbed forward/backward when switching directly between
+         them while theater is already open — no trip back through the main
+         photo. Themes without this key fall back to the .tu-motif--
+         gradient poster.
      ══════════════════════════════════════════════════════════════════════════ */
   var theater = (function () {
     var THEMES = window.TU_THEATER_DATA || [];
@@ -744,7 +742,7 @@
       byId[t.id] = t;
     });
 
-    var CLIP_DUR = 1600; /* ms — linked-pair scrub duration (real "video" playback) */
+    var CLIP_DUR = 1600; /* ms — full clip scrub duration (open/close/linked-pair) */
     var LEG_DUR = 420;
     var FADE_DUR = 420;
 
@@ -787,7 +785,7 @@
       lastFrameIdx: {} /* per-theme: which frame index it's parked on */,
     };
 
-    var frameCache = {}; /* frames.dir -> array of Image objects */
+    var frameCache = {}; /* clip dir -> array of Image objects */
     var activeTransitionId = 0;
     var lastLaunchBtn = null;
 
@@ -798,10 +796,11 @@
       return cfg.dir + cfg.prefix + n + "." + cfg.ext;
     }
 
-    function ensureFrames(themeId) {
-      var theme = byId[themeId];
-      if (!theme || !theme.frames) return null;
-      var cfg = theme.frames;
+    /* Generic loader/cache keyed by clip directory — used for both the
+       linked-pair `frames` config and the main-photo `openFrames` config,
+       since they're just two different frame sequences with the same shape. */
+    function ensureFramesForConfig(cfg) {
+      if (!cfg) return null;
       if (frameCache[cfg.dir]) return frameCache[cfg.dir];
       var arr = [];
       for (var i = 0; i < cfg.count; i++) {
@@ -813,11 +812,24 @@
       return arr;
     }
 
+    function ensureFrames(themeId) {
+      var theme = byId[themeId];
+      if (!theme || !theme.frames) return null;
+      return ensureFramesForConfig(theme.frames);
+    }
+
+    function ensureOpenFrames(themeId) {
+      var theme = byId[themeId];
+      if (!theme || !theme.openFrames) return null;
+      return ensureFramesForConfig(theme.openFrames);
+    }
+
     /* Warm the cache for any theme that already has frames, low priority,
        so the first click doesn't stall on network. */
     window.setTimeout(function () {
       THEMES.forEach(function (t) {
-        if (t.frames) ensureFrames(t.id);
+        if (t.frames) ensureFramesForConfig(t.frames);
+        if (t.openFrames) ensureFramesForConfig(t.openFrames);
       });
     }, 400);
 
@@ -916,6 +928,23 @@
       });
     }
 
+    /* ── Settle a theme into its resting frame / poster (no forward-from-main
+       animation) — this is the original "just show it" behavior, still used
+       when a theme has no dedicated openFrames clip. ──────────────────── */
+    function arriveAt(target, targetFrames, myTransitionId) {
+      if (targetFrames) {
+        canvas.classList.add("is-visible");
+        setPoster(null, false);
+        var restIdx = restIndexFor(target);
+        drawFrame(targetFrames[restIdx]);
+        state.lastFrameIdx[target.id] = restIdx;
+      } else {
+        canvas.classList.remove("is-visible");
+        setPoster(target.motif, true);
+      }
+      state.activeId = target.id;
+    }
+
     /* ── Core transition: go from whatever is showing to `targetId` ────── */
     function goTo(targetId, myTransitionId) {
       var target = byId[targetId];
@@ -992,23 +1021,57 @@
       arriveAt(target, targetFrames, myTransitionId);
     }
 
-    function arriveAt(target, targetFrames, myTransitionId) {
-      if (targetFrames) {
+    /* ── First open from the closed/default main screen: scrub forward
+       through the theme's dedicated openFrames clip (main photo -> theme),
+       ending on the theme's normal switch-clip rest frame so a subsequent
+       card-to-card switch (goTo/Branch A) picks up seamlessly. Falls back
+       to the old instant-settle behavior if the theme has no openFrames
+       clip defined yet. ──────────────────────────────────────────────── */
+    function openFromMain(targetId, myTransitionId) {
+      var target = byId[targetId];
+      if (!target) return;
+
+      setContent(target);
+      setActiveFilm(targetId);
+      root.classList.remove("is-content-visible");
+      window.setTimeout(function () {
+        if (myTransitionId === activeTransitionId)
+          root.classList.add("is-content-visible");
+      }, 60);
+
+      var openFrames = target.openFrames ? ensureOpenFrames(targetId) : null;
+
+      if (openFrames && openFrames.length) {
         canvas.classList.add("is-visible");
         setPoster(null, false);
-        var restIdx = restIndexFor(target);
-        drawFrame(targetFrames[restIdx]);
-        state.lastFrameIdx[target.id] = restIdx;
-      } else {
-        canvas.classList.remove("is-visible");
-        setPoster(target.motif, true);
+        drawFrame(openFrames[0]);
+        tween(
+          openFrames,
+          0,
+          openFrames.length - 1,
+          CLIP_DUR,
+          myTransitionId,
+          function () {
+            if (myTransitionId !== activeTransitionId) return;
+            /* Forward scrub done — settle into this theme's normal
+               switch-clip rest frame (or poster) for any later switch. */
+            var targetFrames = target.frames ? ensureFrames(targetId) : null;
+            arriveAt(target, targetFrames, myTransitionId);
+          },
+        );
+        return;
       }
-      state.activeId = target.id;
+
+      /* No dedicated open clip yet — old behavior: snap straight to the
+         theme's switch-clip rest frame, or its motif gradient poster. */
+      var targetFrames = target.frames ? ensureFrames(targetId) : null;
+      arriveAt(target, targetFrames, myTransitionId);
     }
 
     function open(themeId, launchBtn) {
       var myTransitionId = ++activeTransitionId;
       lastLaunchBtn = launchBtn || lastLaunchBtn;
+      var wasClosed = !state.isOpen;
 
       if (!state.isOpen) {
         state.isOpen = true;
@@ -1021,7 +1084,12 @@
       }
 
       if (launchBtn) setRingExpanded(themeId, true);
-      goTo(themeId, myTransitionId);
+
+      if (wasClosed) {
+        openFromMain(themeId, myTransitionId);
+      } else {
+        goTo(themeId, myTransitionId);
+      }
     }
 
     function close() {
@@ -1029,6 +1097,8 @@
       var myTransitionId = ++activeTransitionId;
       var fromId = state.activeId;
       var fromTheme = fromId ? byId[fromId] : null;
+      var fromOpenFrames =
+        fromTheme && fromTheme.openFrames ? ensureOpenFrames(fromId) : null;
       var fromFrames =
         fromTheme && fromTheme.frames ? ensureFrames(fromId) : null;
 
@@ -1053,7 +1123,25 @@
         return;
       }
 
-      if (fromFrames) {
+      /* Closing always exits back through the main-photo screen. If this
+         theme has its own openFrames clip, reverse-scrub it (theme -> main)
+         from its last frame back to frame 0 — the true mirror of
+         openFromMain(). Falls back to the old behavior (reverse the
+         switch-clip, or fade the poster) for themes with no openFrames yet. */
+      if (fromOpenFrames && fromOpenFrames.length) {
+        var lastIdx = fromOpenFrames.length - 1;
+        drawFrame(fromOpenFrames[lastIdx]);
+        tween(
+          fromOpenFrames,
+          lastIdx,
+          0,
+          CLIP_DUR,
+          myTransitionId,
+          function () {
+            if (myTransitionId === activeTransitionId) finish();
+          },
+        );
+      } else if (fromFrames) {
         var fromIdx =
           state.lastFrameIdx[fromId] != null
             ? state.lastFrameIdx[fromId]
@@ -1098,7 +1186,6 @@
 
     if (reduceMotion) {
       /* Reduced motion: skip all tweening, snap straight to target frame/poster. */
-      var realGoTo = goTo;
       goTo = function (targetId, myTransitionId) {
         var target = byId[targetId];
         if (!target) return;
@@ -1117,6 +1204,11 @@
           setPoster(target.motif, true);
         }
         state.activeId = targetId;
+      };
+      /* Also skip the open-from-main scrub in reduced motion — snap
+         straight to the same resting state goTo would use. */
+      openFromMain = function (targetId, myTransitionId) {
+        goTo(targetId, myTransitionId);
       };
     }
 

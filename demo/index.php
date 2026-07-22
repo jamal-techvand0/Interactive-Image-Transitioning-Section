@@ -11,6 +11,7 @@
 <link rel="stylesheet" href="team-unique.css">
 <style>
   /* page chrome for the demo only — not part of the shipped section */
+  html, body { overflow-x: hidden; }
   body { margin: 0; background: #fff; }
   .demo-note {
     max-width: 1180px; margin: 24px auto 0; padding: 0 20px;
@@ -23,6 +24,8 @@
 
 <?php require __DIR__ . '/../team-unique-section.php'; ?>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/Flip.min.js"></script>
 <script src="team-unique.js"></script>
 </body>
 </html>

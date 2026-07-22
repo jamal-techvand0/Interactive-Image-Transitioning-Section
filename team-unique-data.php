@@ -33,16 +33,30 @@ return [
         'detail'  => 'High-tech, healthcare, academia, arts and more — our path connects graduates to established organizations, mentors and employers, building bridges to other Jerusalem hubs along the way.',
         'accent'  => '#1C7A80',
         'image'   => 'assets/scene-ecosystem.webp',
-        /* Theater mode: numbered frame sequence for the Hub -> Product video
-           transition. Shares the same frame directory as 'product'; restIndex
-           of 0 means the resting frame is the first frame of the clip. */
+        /* Theater mode — LINKED-PAIR clip: scrubs directly between this theme
+           and 'product' when both are open in theater already (card-to-card
+           switch, no trip back through the main photo). restIndex 0 means
+           this theme's resting frame is the first frame of the clip. */
         'frames'  => [
-            'dir'       => 'assets/theater-frames/hub-to-product/',
+            'dir'       => 'assets/theater-frames/card1-card2/',
             'prefix'    => 'frame_',
             'ext'       => 'jpg',
             'pad'       => 3,
             'count'     => 46,
             'restIndex' => 0,
+        ],
+        /* Theater mode — OPEN clip: scrubs from the main team-photo screen
+           into this theme when clicked from the closed/default state, and
+           reverses on close. Frame 0 = main photo, last frame = this theme
+           settled. Omit this key on any theme with no dedicated open clip
+           yet — theater mode falls back to snapping straight to the
+           linked-pair rest frame (or the motif gradient) for those. */
+        'openFrames' => [
+            'dir'    => 'assets/theater-frames/main-card1/',
+            'prefix' => 'ezgif-frame-',
+            'ext'    => 'jpg',
+            'pad'    => 3,
+            'count'  => 49,
         ],
         'highlights' => [
             ['label' => '40+', 'caption' => 'Partner organizations across the city'],
@@ -61,18 +75,26 @@ return [
         'detail'  => 'Every cohort presents a finished product to a professional or public audience — competitions, hackathons, exhibitions, and galleries held before graduation.',
         'accent'  => '#C89B5C',
         'image'   => 'assets/scene-product.webp',
-        /* Theater mode: numbered frame sequence for the Hub -> Product video
-           transition. Extracted from the Higgsfield Kling clip (card-1.png
-           start frame / card-2.png end frame) at 15fps, 1280x720 JPG.
-           Omit this key entirely on any theme that has no clip yet — theater
-           mode falls back to the existing motif gradient for those. */
+        /* Theater mode — LINKED-PAIR clip: same directory as 'ecosystem'
+           above, scrubbed forward/backward between the two when switching
+           card-to-card while theater is already open. Extracted from the
+           Higgsfield Kling clip (card-1.png start frame / card-2.png end
+           frame) at 15fps, 1280x720 JPG. */
         'frames'  => [
-            'dir'       => 'assets/theater-frames/hub-to-product/',
+            'dir'       => 'assets/theater-frames/card1-card2/',
             'prefix'    => 'frame_',
             'ext'       => 'jpg',
             'pad'       => 3,
             'count'     => 46,
             'restIndex' => 45,
+        ],
+        /* Theater mode — OPEN clip: main team-photo screen -> this theme. */
+        'openFrames' => [
+            'dir'    => 'assets/theater-frames/main-card2/',
+            'prefix' => 'ezgif-frame-',
+            'ext'    => 'jpg',
+            'pad'    => 3,
+            'count'  => 49,
         ],
         'highlights' => [
             ['label' => '1', 'caption' => 'Final showcase every single cohort'],
