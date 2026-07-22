@@ -406,9 +406,14 @@
       return;
     }
 
-    /* Set new panel to be visible in DOM and place it above the old one */
+    /* Ensure new panel content starts in hidden state for animation */
+    newPanel.classList.remove("is-visible");
     newPanel.hidden = false;
     newPanel.classList.add("is-transitioning-in");
+
+    /* Force a synchronous reflow so the browser registers the initial
+       (opacity:0 / translateY) state before we add .is-visible */
+    void newPanel.offsetHeight;
 
     requestAnimationFrame(function () {
       requestAnimationFrame(function () {
@@ -739,8 +744,19 @@
       byId[t.id] = t;
     });
 
-    var LEG_DUR = 420; /* ms — one canvas leg (retreat OR advance) */
-    var FADE_DUR = 420; /* ms — poster crossfade / canvas<->poster swap */
+    var CLIP_DUR = 1600; /* ms — linked-pair scrub duration (real "video" playback) */
+    var LEG_DUR = 420;
+    var FADE_DUR = 420;
+
+    function restIndexFor(theme) {
+      if (theme.frames && theme.frames.restIndex != null)
+        return theme.frames.restIndex;
+      return theme.frames ? theme.frames.count - 1 : 0;
+    }
+
+    function sameClip(a, b) {
+      return a.frames && b.frames && a.frames.dir === b.frames.dir;
+    }
 
     var root = document.getElementById("tu-theater");
     var canvas = document.getElementById("tu-theater-canvas");
@@ -771,7 +787,7 @@
       lastFrameIdx: {} /* per-theme: which frame index it's parked on */,
     };
 
-    var frameCache = {}; /* themeId -> array of Image objects */
+    var frameCache = {}; /* frames.dir -> array of Image objects */
     var activeTransitionId = 0;
     var lastLaunchBtn = null;
 
@@ -785,15 +801,15 @@
     function ensureFrames(themeId) {
       var theme = byId[themeId];
       if (!theme || !theme.frames) return null;
-      if (frameCache[themeId]) return frameCache[themeId];
       var cfg = theme.frames;
+      if (frameCache[cfg.dir]) return frameCache[cfg.dir];
       var arr = [];
       for (var i = 0; i < cfg.count; i++) {
         var img = new Image();
         img.src = frameUrl(cfg, i);
         arr.push(img);
       }
-      frameCache[themeId] = arr;
+      frameCache[cfg.dir] = arr;
       return arr;
     }
 
@@ -919,52 +935,75 @@
       var fromFrames =
         fromTheme && fromTheme.frames ? ensureFrames(fromId) : null;
 
-      function showTargetForward() {
-        if (targetFrames) {
-          canvas.classList.add("is-visible");
-          setPoster(null, false);
-          var startIdx = 0;
-          drawFrame(targetFrames[0]);
+      /* ─── Branch A: going from one frame-theme to another in the same
+             clip directory (linked pair, e.g. ecosystem <-> product) ─── */
+      if (fromFrames && targetFrames && sameClip(fromTheme, target)) {
+        var startIdx =
+          state.lastFrameIdx[fromId] != null
+            ? state.lastFrameIdx[fromId]
+            : restIndexFor(fromTheme);
+        canvas.classList.add("is-visible");
+        setPoster(null, false);
+        drawFrame(fromFrames[startIdx]);
+        tween(
+          fromFrames,
+          startIdx,
+          restIndexFor(target),
+          CLIP_DUR,
+          myTransitionId,
+          function () {
+            state.lastFrameIdx[targetId] = restIndexFor(target);
+            state.activeId = targetId;
+          },
+        );
+        return;
+      }
+
+      /* ─── Branch B: settling an unrelated frame-theme, or leaving
+             a poster theme, or first open ─── */
+
+      /* If we are currently showing a frame theme that is NOT in the same
+         clip as the target, first settle it to its own restIndex. */
+      if (fromFrames && (!targetFrames || !sameClip(fromTheme, target))) {
+        var settleIdx =
+          state.lastFrameIdx[fromId] != null
+            ? state.lastFrameIdx[fromId]
+            : restIndexFor(fromTheme);
+        var targetRest = restIndexFor(fromTheme);
+        if (settleIdx !== targetRest) {
           tween(
-            targetFrames,
-            startIdx,
-            targetFrames.length - 1,
+            fromFrames,
+            settleIdx,
+            targetRest,
             LEG_DUR,
             myTransitionId,
             function () {
-              state.lastFrameIdx[targetId] = targetFrames.length - 1;
+              if (myTransitionId !== activeTransitionId) return;
+              state.lastFrameIdx[fromId] = targetRest;
+              arriveAt(target, targetFrames, myTransitionId);
             },
           );
+          return;
         } else {
-          canvas.classList.remove("is-visible");
-          setPoster(target.motif, true);
+          /* Already at rest — just proceed */
         }
-        state.activeId = targetId;
       }
 
-      if (fromFrames) {
-        /* Leg A — retreat: play the open clip backward to frame 0 (hub) */
-        var fromIdx =
-          state.lastFrameIdx[fromId] != null
-            ? state.lastFrameIdx[fromId]
-            : fromFrames.length - 1;
-        tween(fromFrames, fromIdx, 0, LEG_DUR, myTransitionId, function () {
-          if (myTransitionId !== activeTransitionId) return;
-          state.lastFrameIdx[fromId] = 0;
-          /* Leg B — advance into the target from the shared hub frame */
-          showTargetForward();
-        });
-      } else if (fromId) {
-        /* Coming from a poster theme — simple crossfade, no canvas legs */
-        setPoster(fromTheme.motif, false);
-        window.setTimeout(function () {
-          if (myTransitionId !== activeTransitionId) return;
-          showTargetForward();
-        }, FADE_DUR);
+      arriveAt(target, targetFrames, myTransitionId);
+    }
+
+    function arriveAt(target, targetFrames, myTransitionId) {
+      if (targetFrames) {
+        canvas.classList.add("is-visible");
+        setPoster(null, false);
+        var restIdx = restIndexFor(target);
+        drawFrame(targetFrames[restIdx]);
+        state.lastFrameIdx[target.id] = restIdx;
       } else {
-        /* First open — no retreat needed */
-        showTargetForward();
+        canvas.classList.remove("is-visible");
+        setPoster(target.motif, true);
       }
+      state.activeId = target.id;
     }
 
     function open(themeId, launchBtn) {
@@ -1018,7 +1057,7 @@
         var fromIdx =
           state.lastFrameIdx[fromId] != null
             ? state.lastFrameIdx[fromId]
-            : fromFrames.length - 1;
+            : restIndexFor(fromTheme);
         tween(fromFrames, fromIdx, 0, LEG_DUR, myTransitionId, function () {
           if (myTransitionId === activeTransitionId) finish();
         });
@@ -1070,8 +1109,9 @@
         if (frames) {
           canvas.classList.add("is-visible");
           setPoster(null, false);
-          drawFrame(frames[frames.length - 1]);
-          state.lastFrameIdx[targetId] = frames.length - 1;
+          var restIdx = restIndexFor(target);
+          drawFrame(frames[restIdx]);
+          state.lastFrameIdx[targetId] = restIdx;
         } else {
           canvas.classList.remove("is-visible");
           setPoster(target.motif, true);

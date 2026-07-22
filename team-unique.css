@@ -1422,6 +1422,19 @@
   z-index: 2;
   max-width: 620px;
   color: var(--tu-white);
+  opacity: 0;
+  transform: translateY(20px);
+  transition:
+    opacity 500ms var(--tu-ease),
+    transform 500ms var(--tu-ease);
+}
+
+.tu-theater.is-open .tu-theater-content {
+  opacity: 1;
+  transform: translateY(0);
+  transition:
+    opacity 500ms var(--tu-ease) 200ms,
+    transform 500ms var(--tu-ease) 200ms;
 }
 
 .tu-theater-kicker {

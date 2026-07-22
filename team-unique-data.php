@@ -33,6 +33,17 @@ return [
         'detail'  => 'High-tech, healthcare, academia, arts and more — our path connects graduates to established organizations, mentors and employers, building bridges to other Jerusalem hubs along the way.',
         'accent'  => '#1C7A80',
         'image'   => 'assets/scene-ecosystem.webp',
+        /* Theater mode: numbered frame sequence for the Hub -> Product video
+           transition. Shares the same frame directory as 'product'; restIndex
+           of 0 means the resting frame is the first frame of the clip. */
+        'frames'  => [
+            'dir'       => 'assets/theater-frames/hub-to-product/',
+            'prefix'    => 'frame_',
+            'ext'       => 'jpg',
+            'pad'       => 3,
+            'count'     => 46,
+            'restIndex' => 0,
+        ],
         'highlights' => [
             ['label' => '40+', 'caption' => 'Partner organizations across the city'],
             ['label' => 'Hospitals & Labs', 'caption' => 'Direct clinical and research exposure'],
@@ -56,11 +67,12 @@ return [
            Omit this key entirely on any theme that has no clip yet — theater
            mode falls back to the existing motif gradient for those. */
         'frames'  => [
-            'dir'    => 'assets/theater-frames/hub-to-product/',
-            'prefix' => 'frame_',
-            'ext'    => 'jpg',
-            'pad'    => 3,
-            'count'  => 46,
+            'dir'       => 'assets/theater-frames/hub-to-product/',
+            'prefix'    => 'frame_',
+            'ext'       => 'jpg',
+            'pad'       => 3,
+            'count'     => 46,
+            'restIndex' => 45,
         ],
         'highlights' => [
             ['label' => '1', 'caption' => 'Final showcase every single cohort'],
