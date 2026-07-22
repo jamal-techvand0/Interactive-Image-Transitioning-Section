@@ -721,6 +721,198 @@
   });
 
   /* ══════════════════════════════════════════════════════════════════════════
+     STAGE BACKGROUND SCRUBBER — PERSISTENT FRAME BACKGROUND
+     
+     The stage canvas (behind the ring) is the PRIMARY background, not an
+     overlay. On page load it draws frame 0 of the first available openFrames
+     clip — that IS the team photo. When a card with openFrames is clicked,
+     it smoothly morphs through the JPG frames. On close, it reverses back.
+     
+     The key principle: the canvas is NEVER cleared. It always shows the last
+     drawn frame, so there's no flash/pop between the CSS background and the
+     frame sequence.
+     ══════════════════════════════════════════════════════════════════════════ */
+  var stageBg = (function () {
+    var canvas = document.getElementById("tu-stage-canvas");
+    if (!canvas) return { scrub: function () {}, reset: function () {} };
+    var ctx = canvas.getContext("2d");
+    var frameCache = {};
+    var activeTransitionId = 0;
+    var lastDrawnImg = null;
+    var loaded = false;
+
+    /* ── Find the first theme with openFrames to use as the default ───── */
+    var defaultCfg = null;
+    (function () {
+      var themes = window.TU_THEATER_DATA || [];
+      for (var i = 0; i < themes.length; i++) {
+        if (themes[i].openFrames) {
+          defaultCfg = themes[i].openFrames;
+          break;
+        }
+      }
+    })();
+
+    function sizeCanvas() {
+      var vw = window.innerWidth;
+      var vh = window.innerHeight;
+      var dpr = window.devicePixelRatio || 1;
+      canvas.width = vw * dpr;
+      canvas.height = vh * dpr;
+      canvas.style.width = vw + "px";
+      canvas.style.height = vh + "px";
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      /* After resize, redraw the last known frame so it stays visible */
+      if (lastDrawnImg) redraw(lastDrawnImg);
+    }
+
+    function frameUrl(cfg, i) {
+      var n = String(i + 1);
+      while (n.length < cfg.pad) n = "0" + n;
+      return cfg.dir + cfg.prefix + n + "." + cfg.ext;
+    }
+
+    function ensureFrames(cfg) {
+      if (!cfg) return null;
+      if (frameCache[cfg.dir]) return frameCache[cfg.dir];
+      var arr = [];
+      for (var i = 0; i < cfg.count; i++) {
+        var img = new Image();
+        img.src = frameUrl(cfg, i);
+        arr.push(img);
+      }
+      frameCache[cfg.dir] = arr;
+      return arr;
+    }
+
+    function redraw(img) {
+      if (!img) return;
+      var dpr = window.devicePixelRatio || 1;
+      var cw = canvas.width / dpr;
+      var ch = canvas.height / dpr;
+      var iw = img.naturalWidth || img.width;
+      var ih = img.naturalHeight || img.height;
+      if (!iw || !ih) return;
+      var scale = Math.max(cw / iw, ch / ih);
+      var dw = iw * scale,
+        dh = ih * scale;
+      var dx = (cw - dw) / 2,
+        dy = (ch - dh) / 2;
+      ctx.clearRect(0, 0, cw, ch);
+      ctx.drawImage(img, dx, dy, dw, dh);
+    }
+
+    function tween(frames, startIdx, endIdx, duration, transitionId, onDone) {
+      var t0 = performance.now();
+      function step(now) {
+        if (transitionId !== activeTransitionId) return;
+        var p = Math.min((now - t0) / duration, 1);
+        var idx = Math.round(startIdx + (endIdx - startIdx) * p);
+        var img = frames[Math.max(0, Math.min(frames.length - 1, idx))];
+        if (img) {
+          lastDrawnImg = img;
+          redraw(img);
+        }
+        if (p < 1) {
+          requestAnimationFrame(step);
+        } else {
+          onDone();
+        }
+      }
+      requestAnimationFrame(step);
+    }
+
+    /* ── Load and draw frame 0 on page start ──────────────────────────── */
+    function init() {
+      if (!defaultCfg) return;
+      sizeCanvas();
+      var frames = ensureFrames(defaultCfg);
+      if (frames && frames.length > 0) {
+        /* Draw frame 0 (the team photo) once it's loaded */
+        var check = function () {
+          if (frames[0].naturalWidth) {
+            lastDrawnImg = frames[0];
+            redraw(frames[0]);
+            loaded = true;
+          } else {
+            setTimeout(check, 100);
+          }
+        };
+        check();
+      }
+    }
+
+    /* ── Public scrub: transitions the background through frames ───────── */
+    function scrub(themeId, fromMain) {
+      var myId = ++activeTransitionId;
+      sizeCanvas();
+      var themes = window.TU_THEATER_DATA || [];
+      var byId = {};
+      themes.forEach(function (t) {
+        byId[t.id] = t;
+      });
+      var theme = byId[themeId];
+      if (!theme) return;
+
+      var cfg = theme.openFrames;
+      var frames = cfg ? ensureFrames(cfg) : null;
+      if (!frames || !frames.length) {
+        /* No openFrames for this theme — draw frame 0 of default as rest */
+        var defFrames = defaultCfg ? ensureFrames(defaultCfg) : null;
+        if (defFrames && defFrames.length > 0) {
+          lastDrawnImg = defFrames[0];
+          redraw(defFrames[0]);
+        }
+        return;
+      }
+
+      if (fromMain) {
+        /* Opening: forward scrub from frame 0 (team photo) to last frame */
+        redraw(frames[0]);
+        lastDrawnImg = frames[0];
+        tween(frames, 0, frames.length - 1, 1600, myId, function () {
+          lastDrawnImg = frames[frames.length - 1];
+        });
+      } else {
+        /* Closing: reverse scrub from last frame back to frame 0 */
+        redraw(frames[frames.length - 1]);
+        lastDrawnImg = frames[frames.length - 1];
+        tween(frames, frames.length - 1, 0, 1600, myId, function () {
+          lastDrawnImg = frames[0];
+        });
+      }
+    }
+
+    /* ── Reset: reverse-scrub back to frame 0 ──────────────────────────── */
+    function reset() {
+      /* No-op: the reverse scrub is handled by scrub(themeId, false) which
+         is called from theater.close() before reset(). If reset() is ever
+         called independently, tween back to the default frame 0. */
+      var cfg = defaultCfg;
+      var frames = cfg ? ensureFrames(cfg) : null;
+      if (frames && frames.length > 0 && lastDrawnImg !== frames[0]) {
+        var myId = ++activeTransitionId;
+        var startIdx = frames.indexOf(lastDrawnImg);
+        if (startIdx < 0) startIdx = frames.length - 1;
+        tween(frames, startIdx, 0, 800, myId, function () {
+          lastDrawnImg = frames[0];
+        });
+      }
+    }
+
+    /* Size on first paint, then init frame 0 */
+    window.setTimeout(function () {
+      sizeCanvas();
+      init();
+    }, 50);
+    window.addEventListener("resize", function () {
+      if (canvas.width > 0) sizeCanvas();
+    });
+
+    return { scrub: scrub, reset: reset };
+  })();
+
+  /* ══════════════════════════════════════════════════════════════════════════
      THEATER MODE
      Full-screen video-driven takeover, opened in place of the old side panel.
 
@@ -1087,6 +1279,7 @@
 
       if (wasClosed) {
         openFromMain(themeId, myTransitionId);
+        stageBg.scrub(themeId, true);
       } else {
         goTo(themeId, myTransitionId);
       }
@@ -1141,6 +1334,7 @@
             if (myTransitionId === activeTransitionId) finish();
           },
         );
+        stageBg.scrub(fromId, false);
       } else if (fromFrames) {
         var fromIdx =
           state.lastFrameIdx[fromId] != null
@@ -1149,11 +1343,13 @@
         tween(fromFrames, fromIdx, 0, LEG_DUR, myTransitionId, function () {
           if (myTransitionId === activeTransitionId) finish();
         });
+        stageBg.scrub(fromId, false);
       } else {
         setPoster(fromTheme ? fromTheme.motif : null, false);
         window.setTimeout(function () {
           if (myTransitionId === activeTransitionId) finish();
         }, FADE_DUR);
+        stageBg.scrub(fromId, false);
       }
     }
 

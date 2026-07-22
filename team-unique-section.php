@@ -19,6 +19,7 @@ $tuThemes = require __DIR__ . '/team-unique-data.php';
   </div>
 
   <div class="tu-stage">
+    <canvas class="tu-stage-canvas" id="tu-stage-canvas" aria-hidden="true"></canvas>
     <div class="tu-ring" role="group" aria-label="Six themes — select one to expand">
 
       <?php foreach ($tuThemes as $i => $theme):
@@ -276,6 +277,7 @@ $tuThemes = require __DIR__ . '/team-unique-data.php';
             'detail'  => $t['detail'],
             'accent'  => $t['accent'],
             'frames'  => isset($t['frames']) ? $t['frames'] : null,
+            'openFrames' => isset($t['openFrames']) ? $t['openFrames'] : null,
         ];
     }, $tuThemes), JSON_UNESCAPED_SLASHES) ?>;
   </script>
